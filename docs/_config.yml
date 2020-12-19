@@ -1,0 +1,6 @@
+remote_theme: pmarsceill/just-the-docs
+search_enabled: true
+aux_links:
+  'fp-ts-std on GitHub':
+    - 'https://github.com/samhh/fp-ts-std'
+
