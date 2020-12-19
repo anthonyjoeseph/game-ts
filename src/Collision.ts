@@ -25,6 +25,13 @@ export const contains = (outer: Rect): Predicate<Rect> => (inner) =>
   outer.x + outer.width >= inner.x + inner.width &&
   outer.y + outer.height >= inner.y + inner.height
 
+
+export const containsWithin = (outer: Rect): Predicate<Rect> => (inner) =>
+  outer.x < inner.x &&
+  outer.y < inner.y &&
+  outer.x + outer.width > inner.x + inner.width &&
+  outer.y + outer.height > inner.y + inner.height
+
 export const collisionsRO = <A>(compare: (a: A) => Predicate<A>) => (
   as: ReadonlyArray<A>,
 ): ReadonlyArray<[A, A]> =>

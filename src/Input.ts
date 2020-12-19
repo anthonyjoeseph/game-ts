@@ -8,7 +8,7 @@ import * as ro from 'rxjs/operators'
 import * as OB from 'fp-ts-rxjs/lib/Observable'
 
 type PressType = 'up' | 'down'
-type Press = {
+interface Press {
   code: string
   type: PressType
 };
