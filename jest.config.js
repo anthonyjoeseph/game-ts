@@ -1,21 +1,10 @@
 module.exports = {
-  preset: "ts-jest",
-  testEnvironment: "node",
-  testRegex: "/test/",
-  collectCoverage: true,
-  collectCoverageFrom: ["./src/**/*"],
-  coveragePathIgnorePatterns: ["index.ts"],
-  coverageProvider: "v8",
-  coverageThreshold: {
-    global: {
-      branches: 100,
-      functions: 100,
-      lines: 100,
-      statements: 100,
-    },
-  },
+  preset: 'ts-jest',
+  testEnvironment: 'jsdom',
+  setupFiles: ['<rootDir>/test/setup.ts'],
+  testRegex: '(\\.|/)(test|spec)\\.tsx?$',
   globals: {
-    "ts-jest": {
+    'ts-jest': {
       diagnostics: false,
     },
   },

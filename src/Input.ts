@@ -11,7 +11,7 @@ type PressType = 'up' | 'down'
 interface Press {
   code: string
   type: PressType
-};
+}
 
 const pressFromEvent = (type: PressType) => (event: Event): Press => ({
   code: (event as KeyboardEvent).code,

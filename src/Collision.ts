@@ -1,4 +1,3 @@
-import * as Eq from 'fp-ts/Eq'
 import { pipe, Predicate } from 'fp-ts/function'
 import { Rect } from 'graphics-ts/lib/Shape'
 import * as RA from 'fp-ts/ReadonlyArray'
@@ -25,14 +24,13 @@ export const contains = (outer: Rect): Predicate<Rect> => (inner) =>
   outer.x + outer.width >= inner.x + inner.width &&
   outer.y + outer.height >= inner.y + inner.height
 
-
 export const containsWithin = (outer: Rect): Predicate<Rect> => (inner) =>
   outer.x < inner.x &&
   outer.y < inner.y &&
   outer.x + outer.width > inner.x + inner.width &&
   outer.y + outer.height > inner.y + inner.height
 
-export const collisionsRO = <A>(compare: (a: A) => Predicate<A>) => (
+export const readonlyCollisions = <A>(compare: (a: A) => Predicate<A>) => (
   as: ReadonlyArray<A>,
 ): ReadonlyArray<[A, A]> =>
   pipe(
@@ -47,5 +45,6 @@ export const collisionsRO = <A>(compare: (a: A) => Predicate<A>) => (
     ),
   )
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const collisions: <A>(eq: Eq.Eq<A>) => (as: Array<A>) => Array<[A, A]> = collisionsRO as any
+export const collisions: <A>(
+  compare: (a: A) => Predicate<A>,
+) => (as: Array<A>) => Array<[A, A]> = readonlyCollisions as never
