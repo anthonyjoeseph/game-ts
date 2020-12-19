@@ -88,7 +88,7 @@ describe('Sprite', () => {
   })
 
   describe('animate', () => {
-    it("delta beneath current duration doesn't leaves it where it is", () => {
+    it('delta beneath current duration leaves it where it is', () => {
       const newSprite = animate(MILLIS_PER_FRAME - 1)(testSprite)
       assert.deepStrictEqual(newSprite.frames.lefts.length, 0)
     })
