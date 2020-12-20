@@ -1,6 +1,6 @@
 # game-ts
 
-Combines graphics-ts with rxjs, plus disperate utilities for input & sprites
+Combines graphics-ts with rxjs, plus disparate utilities for input & sprites
 
 # example usage
 
