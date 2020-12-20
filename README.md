@@ -53,9 +53,11 @@ frame$.subscribe()
 
 [game-demo-parcel](https://github.com/anthonyjoeseph/game-demo-parcel)
 
-# TODO / ideas
+# pairs well with
 
-- [tilemaps](https://doc.mapeditor.org/en/stable/)
+- denotative geometry via [geometric.js](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/geometric/index.d.ts)
+- box2D physics via [planck.js](https://github.com/shakiba/planck.js/blob/master/lib/index.d.ts) ([world.step](https://github.com/shakiba/planck.js/blob/master/docs/classes/world.md#step) works well with [frameDeltaMillis$](https://github.com/anthonyjoeseph/game-ts/blob/master/src/Render.ts))
+
+# TODO
+
 - io-ts schemas for [pixi.js](https://github.com/pixijs/pixi.js/blob/main/packages/spritesheet/src/Spritesheet.ts)-style [sprite sheets](https://github.com/krzysztof-o/spritesheet.js/blob/master/templates/jsonarray.template) and [tilemaps](https://doc.mapeditor.org/en/stable/reference/json-map-format/)
-- denotative geometry with [geometric.js](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/geometric/index.d.ts)
-- physics with box2D via [planck.js](https://github.com/shakiba/planck.js/blob/master/lib/index.d.ts)
