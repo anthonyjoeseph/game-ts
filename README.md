@@ -52,3 +52,10 @@ frame$.subscribe()
 # in-depth example
 
 [game-demo-parcel](https://github.com/anthonyjoeseph/game-demo-parcel)
+
+# TODO / ideas
+
+- [tilemaps](https://doc.mapeditor.org/en/stable/)
+- io-ts schemas for [pixi.js](https://github.com/pixijs/pixi.js/blob/main/packages/spritesheet/src/Spritesheet.ts)-style [sprite sheets](https://github.com/krzysztof-o/spritesheet.js/blob/master/templates/jsonarray.template) and [tilemaps](https://doc.mapeditor.org/en/stable/reference/json-map-format/)
+- denotative geometry with [geometric.js](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/geometric/index.d.ts)
+- physics with box2D via [planck.js](https://github.com/shakiba/planck.js/blob/master/lib/index.d.ts)
