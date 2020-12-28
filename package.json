@@ -56,12 +56,15 @@
     "rxjs": "^6.6.3"
   },
   "dependencies": {
+    "@juggle/resize-observer": "^3.2.0",
     "assert": "^2.0.0",
     "fetch-img": "^0.1.0",
     "fp-ts-contrib": "^0.1.21",
     "fp-ts-rxjs": "^0.6.11",
     "fp-ts-std": "^0.7.0",
     "graphics-ts": "^1.1.0",
+    "io-ts": "^2.2.13",
+    "io-ts-types": "^0.5.12",
     "monocle-ts": "^2.3.3",
     "rxjs": "^7.0.0-beta.9"
   }
