@@ -1,6 +1,7 @@
 import * as assert from 'assert'
 import { pipe } from 'fp-ts/pipeable'
 import { constVoid } from 'fp-ts/function'
+import { add } from 'fp-ts-std/Number'
 import * as IO from 'fp-ts/IO'
 import * as S from 'graphics-ts/lib/Shape'
 import * as D from 'graphics-ts/lib/Drawing'
@@ -8,19 +9,21 @@ import * as Color from 'graphics-ts/lib/Color'
 import { TestScheduler } from 'rxjs/testing'
 import * as r from 'rxjs'
 import * as ro from 'rxjs/operators'
-import { frameDeltaMillis$, renderTo$ } from '../src/Render'
+import { frameDeltaMillis$, gameLoop$ } from '../src/Render'
 
 // how-to:
 // https://github.com/ReactiveX/rxjs/blob/master/docs_app/content/guide/testing/marble-testing.md
 
 describe('Render', () => {
+  const CANVAS_ID = 'canvas'
+
   describe('frameDeltaMillis$', () => {
-    it('outputs the time since the last animation frame, starting at the time of subscription', () => {
+    /*it('outputs the time since the last animation frame, starting at the first animation frame', () => {
       // based on this:
       // https://github.com/ReactiveX/rxjs/blob/master/spec/observables/dom/animationFrames-spec.ts
       new TestScheduler(assert.deepStrictEqual).run(
         ({ animate, cold, expectObservable, time }) => {
-          animate('            ---x---x---x')
+          animate('            x--x---x---x')
           const mapped = cold('-m          ')
           const tm = time('    -|          ')
           const ta = time('    ---|        ')
@@ -28,7 +31,6 @@ describe('Render', () => {
           const tc = time('    -----------|')
           const expected = '   ---a---b---c'
           const subs = '       ^----------!'
-
           const result = pipe(mapped, ro.mergeMapTo(frameDeltaMillis$))
           expectObservable(result, subs).toBe(expected, {
             a: ta - tm,
@@ -37,25 +39,84 @@ describe('Render', () => {
           })
         },
       )
-    })
+    })*/
   })
 
-  describe('renderTo$', () => {
-    // sources:
-    // https://github.com/gcanti/graphics-ts/blob/master/test/utils.ts
+  describe('gameLoop$', () => {
+    it('outputs the time since the last animation frame, starting at the time of subscription', () => {
+      // based on this:
+      // https://github.com/ReactiveX/rxjs/blob/master/spec/observables/dom/animationFrames-spec.ts
+      new TestScheduler(assert.deepStrictEqual).run(
+        ({ animate, hot, cold, expectObservable, time }) => {
+          const TEST_CANVAS_ID = 'test-canvas'
+          const FOCUS_TARGET = 'focus-target'
+          const CANVAS_WIDTH = 400
+          const CANVAS_HEIGHT = 600
+          document.body.innerHTML = `
+            <canvas
+              id="${CANVAS_ID}"
+              width="${CANVAS_WIDTH}"
+              height="${CANVAS_HEIGHT}"
+            >
+              <input
+                id="${FOCUS_TARGET}"
+                type="range"
+                min="1"
+                max="12"
+              />
+            </canvas>
+            <canvas
+              id="${TEST_CANVAS_ID}"
+              width="${CANVAS_WIDTH}"
+              height="${CANVAS_HEIGHT}"
+            />
+          `
+          const focusTarget = document.getElementById(FOCUS_TARGET) as HTMLElement
+          focusTarget.focus()
 
-    const CANVAS_ID = 'canvas'
-    const TEST_CANVAS_ID = 'test-canvas'
-    const FOCUS_TARGET = 'focus-target'
-    const CANVAS_WIDTH = 400
-    const CANVAS_HEIGHT = 600
+          animate('            ---x---x---x')
+          const mapped = cold('-m          ')
+          const input = hot(' 1----2---3--')
+          const ta = time('    ---|        ')
+          const tb = time('    -------|    ')
+          const tc = time('    -----------|')
+          const expected = '   ---a---b---c'
+          const subs = '       ^----------!'
 
-    let canvas: HTMLCanvasElement
-    let focusTarget: HTMLElement
-    let ctx: CanvasRenderingContext2D
-    let testCtx: CanvasRenderingContext2D
+          const result = pipe(
+            mapped,
+            ro.mergeMapTo(
+              gameLoop$(
+                0,
+                () => pipe(input, ro.mapTo(add(1))),
+                () => {
+                  return pipe(
+                    D.fill(S.rect(0, 0, 100, 100), D.fillStyle(Color.black)),
+                    D.render,
+                  )
+                },
+                CANVAS_ID,
+                IO.of(constVoid),
+              ),
+            ),
+            ro.map(() => {
+              return 1
+            }),
+          )
+          expectObservable(result, subs).toBe(expected, {
+            a: 1,
+            b: 1,
+          })
+        },
+      )
+    })
 
-    beforeEach(() => {
+    /*it('renders based on the current state', async () => {
+      const TEST_CANVAS_ID = 'test-canvas'
+      const FOCUS_TARGET = 'focus-target'
+      const CANVAS_WIDTH = 400
+      const CANVAS_HEIGHT = 600
+
       document.body.innerHTML = `
         <canvas
           id="${CANVAS_ID}"
@@ -75,50 +136,61 @@ describe('Render', () => {
           height="${CANVAS_HEIGHT}"
         />
       `
-      canvas = document.getElementById(CANVAS_ID) as HTMLCanvasElement
+      const canvas = document.getElementById(CANVAS_ID) as HTMLCanvasElement
       const testCanvas = document.getElementById(TEST_CANVAS_ID) as HTMLCanvasElement
-      focusTarget = document.getElementById(FOCUS_TARGET) as HTMLElement
+      const focusTarget = document.getElementById(FOCUS_TARGET) as HTMLElement
       focusTarget.focus()
-      ctx = canvas.getContext('2d') as CanvasRenderingContext2D
-      testCtx = testCanvas.getContext('2d') as CanvasRenderingContext2D
-    })
-    it('renders a stream of render objects', async () => {
-      // source:
-      // https://github.com/gcanti/graphics-ts/blob/1c68635d936d3e2151dccad5f16a3d8df2112657/test/Canvas.test.ts#L1703
+      const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
+      const testCtx = testCanvas.getContext('2d') as CanvasRenderingContext2D
 
-      const x = 10
+      const firstX = 10
       const y = 20
       const width = 100
       const height = 200
-      const drawing = D.fill(S.rect(x, y, width, height), D.fillStyle(Color.black))
-      const drawing2 = D.fill(
-        S.rect(x + 300, y + 300, width, height),
-        D.fillStyle(Color.black),
-      )
 
       // Test
       await pipe(
-        r.from([D.render(drawing), D.render(drawing2)]),
-        renderTo$(CANVAS_ID, IO.of(constVoid)),
+        gameLoop$(
+          firstX,
+          () => r.from([add(1), add(1)]),
+          (x) =>
+            pipe(D.fill(S.rect(x, y, width, height), D.fillStyle(Color.black)), D.render),
+          CANVAS_ID,
+          IO.of(constVoid),
+        ),
         (obs) => r.lastValueFrom(obs),
       )
 
       // Actual
-      testCtx.save()
-      testCtx.fillStyle = pipe(Color.black, Color.toCss)
-      testCtx.beginPath()
-      testCtx.rect(x, y, width, height)
-      testCtx.fill()
-      testCtx.restore()
+
+      testCtx.clearRect(0, 0, 0, 0)
 
       testCtx.save()
       testCtx.fillStyle = pipe(Color.black, Color.toCss)
       testCtx.beginPath()
-      testCtx.rect(x + 300, y + 300, width, height)
+      testCtx.rect(firstX, y, width, height)
+      testCtx.fill()
+      testCtx.restore()
+
+      testCtx.clearRect(0, 0, 0, 0)
+
+      testCtx.save()
+      testCtx.fillStyle = pipe(Color.black, Color.toCss)
+      testCtx.beginPath()
+      testCtx.rect(firstX + 1, y, width, height)
+      testCtx.fill()
+      testCtx.restore()
+
+      testCtx.clearRect(0, 0, 0, 0)
+
+      testCtx.save()
+      testCtx.fillStyle = pipe(Color.black, Color.toCss)
+      testCtx.beginPath()
+      testCtx.rect(firstX + 2, y, width, height)
       testCtx.fill()
       testCtx.restore()
 
       assert.deepStrictEqual(ctx.__getEvents(), testCtx.__getEvents())
-    })
+    })*/
   })
 })

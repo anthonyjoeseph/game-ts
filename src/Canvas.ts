@@ -7,14 +7,17 @@ import * as OB from 'fp-ts-rxjs/lib/Observable'
 import * as C from 'graphics-ts/lib/Canvas'
 import * as S from 'graphics-ts/lib/Shape'
 import { ResizeObserver } from '@juggle/resize-observer'
+import { fromIOSync } from './Observable'
 
-export const canvasClientBoundingRect: C.Html<DOMRect> = (canvas) => () =>
-  canvas.getBoundingClientRect()
+export const canvasRect: C.Html<S.Rect> = (canvas) => () => {
+  const domrect = canvas.getBoundingClientRect()
+  return S.rect(domrect.left, domrect.right, domrect.width, domrect.height)
+}
 
 export const canvasRect$ = (canvasId: string): r.Observable<O.Option<S.Rect>> =>
   pipe(
     C.getCanvasElementById(canvasId),
-    OB.fromIO,
+    fromIOSync,
     OB.chain(
       O.fold(
         () => OB.of(O.none),
@@ -23,13 +26,9 @@ export const canvasRect$ = (canvasId: string): r.Observable<O.Option<S.Rect>> =>
             const resizes = new ResizeObserver(A.map(() => sub.next()))
             resizes.observe(canvasElem)
           })
-          canvasElem.getBoundingClientRect()
-          canvasElem.style.left
           return pipe(
-            onResizeCanvas$,
-            ro.startWith(),
-            OB.chain(() => pipe(canvasElem, canvasClientBoundingRect, OB.fromIO)),
-            ro.map(({ x, y, width, height }) => S.rect(x, y, width, height)),
+            r.merge(r.of(undefined), onResizeCanvas$),
+            OB.chain(() => pipe(canvasElem, canvasRect, OB.fromIO)),
             ro.map(O.some),
           )
         },

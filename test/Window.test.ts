@@ -40,7 +40,9 @@ describe('window helpers', () => {
       // source:
       // https://gist.github.com/remarkablemark/8e5a247a663db40f2a2abe420ac43234
       const complete$ = new r.Subject<S.Rect[]>()
-      pipe(windowRect$, ro.take(3), ro.toArray(), (obs) => obs.subscribe(complete$))
+      pipe(windowRect$, ro.observeOn(r.asyncScheduler), ro.take(3), ro.toArray(), (obs) =>
+        obs.subscribe(complete$),
+      )
 
       window.dispatchEvent(new Event('load'))
 

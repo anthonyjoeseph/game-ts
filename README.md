@@ -4,50 +4,59 @@ Combines graphics-ts with rxjs, plus disparate utilities for input & sprites
 
 # example usage
 
+Toggles between blue and black when the 'Enter' key is pressed
+
 ```ts
-import { error } from 'fp-ts/Console'
+import { Endomorphism } from 'fp-ts/function'
 import { pipe } from 'fp-ts/pipeable'
-import * as Z from 'fp-ts-contrib/lib/Zipper'
+import { invert } from 'fp-ts-std/Boolean'
+import { error } from 'fp-ts/Console'
 import * as S from 'graphics-ts/lib/Shape'
+import * as D from 'graphics-ts/lib/Drawing'
+import * as Color from 'graphics-ts/lib/Color'
+import { Key } from 'ts-key-enum'
+import * as r from 'rxjs'
 import * as ro from 'rxjs/operators'
-import { frameDeltaMillis$, renderTo$ } from 'game-ts/Render'
-import { animate, drawSprite, Sprite, SpriteFrame } from 'game-ts/Sprite'
-import { windowRect$ } from 'game-ts/Window'
-import greenCap from './greenCap.png'
+import { gameLoop$ } from './lib/Render'
 
-export const MILLIS_PER_FRAME = 200
+type State = boolean
 
-const frameForIndex = (x: number): SpriteFrame => ({
-  rect: S.rect(16 * x, 0, 16, 18),
-  duration: MILLIS_PER_FRAME,
-})
-
-const initialSprite: Sprite = {
-  animationDelta: 0,
-  frames: Z.fromNonEmptyArray<SpriteFrame>([
-    frameForIndex(0),
-    frameForIndex(1),
-    frameForIndex(0),
-    frameForIndex(2),
-  ]),
-  rect: S.rect(0, 0, 50, 56),
-  src: greenCap,
-}
-
-const frame$ = pipe(
-  frameDeltaMillis$,
-  ro.scan((sprite, deltaMillis) => pipe(sprite, animate(deltaMillis)), initialSprite),
-  ro.withLatestFrom(windowRect$),
-  OB.map(([sprite, windowRect]) =>
+const initialState: State = false
+const frame$ = gameLoop$<State>(
+  initialState,
+  (state$: r.Observable<State>): r.Observable<Endomorphism<State>> =>
     pipe(
-      C.clearRect(windowRect),
-      R.chain(() => drawSprite(sprite)),
+      r.fromEvent(window, 'keydown'),
+      ro.map((e) => (e as KeyboardEvent).code),
+      ro.filter((e) => e === Key.Enter),
+      ro.mapTo(invert),
     ),
-  )
-  renderTo$('canvas', () => error('canvas not found')),
+  (state: State) =>
+    // renders on a window.requestAnimationFrame schedule via rxjs
+    // the canvas is cleared before each render
+    pipe(
+      D.fill(
+        S.rect(0, 0, 100, 100),
+        D.fillStyle(state ? Color.hex('#0400ff') : Color.black),
+      ),
+      D.render,
+    ),
+  'canvas',
+  () => error('canvas not found'),
 )
 frame$.subscribe()
 ```
+
+# features
+
+- [io-ts](https://github.com/gcanti/io-ts) codecs for
+  - spritesheets via [spritesheet.js](https://github.com/krzysztof-o/spritesheet.js) or [TexturePacker](https://www.codeandweb.com/texturepacker)
+  - levels via [Tiled](https://www.mapeditor.org/)
+    - NOTE: tilesets can be packed with `spritesheet.js` or `TexturePacker` as well
+
+- rectangle conversions for denotative geometry (collisions etc) with [geometric.js](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/geometric/index.d.ts)
+
+- various utilities for `Canvas`, `Window`, images, `Zipper` (from [fp-ts-contrib](https://github.com/gcanti/fp-ts-contrib/blob/master/test/Zipper.ts)) and mouse/keyboard input
 
 # in-depth example
 
@@ -55,9 +64,4 @@ frame$.subscribe()
 
 # pairs well with
 
-- denotative geometry via [geometric.js](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/geometric/index.d.ts)
 - box2D physics via [planck.js](https://github.com/shakiba/planck.js/blob/master/lib/index.d.ts) ([world.step](https://github.com/shakiba/planck.js/blob/master/docs/classes/world.md#step) works well with [frameDeltaMillis$](https://github.com/anthonyjoeseph/game-ts/blob/master/src/Render.ts))
-
-# TODO
-
-- io-ts schemas for [pixi.js](https://github.com/pixijs/pixi.js/blob/main/packages/spritesheet/src/Spritesheet.ts)-style [sprite sheets](https://github.com/krzysztof-o/spritesheet.js/blob/master/templates/jsonarray.template) and [tilemaps](https://doc.mapeditor.org/en/stable/reference/json-map-format/)

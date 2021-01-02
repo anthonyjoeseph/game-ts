@@ -9,6 +9,7 @@ import * as OB from 'fp-ts-rxjs/lib/Observable'
 import * as C from 'graphics-ts/lib/Canvas'
 import * as S from 'graphics-ts/lib/Shape'
 import { canvasRect$ } from './Canvas'
+import { fromIOSync } from './Observable'
 
 export const frameDeltaMillis$ = pipe(
   r.animationFrames(),
@@ -18,7 +19,7 @@ export const frameDeltaMillis$ = pipe(
   OB.map(([prev, cur]) => cur - prev),
 )
 
-export const gameLoop$ = <S, A>(
+export const gameLoop$ = <S, A = CanvasRenderingContext2D>(
   initialState: S,
   input: (state$: r.Observable<S>) => r.Observable<Endomorphism<S>>,
   render: (state: S) => C.Render<A>,
@@ -37,7 +38,7 @@ export const gameLoop$ = <S, A>(
     ro.withLatestFrom(
       pipe(
         canvasRect$(canvasId),
-        OB.chainFirst(O.fold(flow(onCanvasNotFound, OB.fromIO), () => OB.of(undefined))),
+        OB.chainFirst(O.fold(flow(onCanvasNotFound, fromIOSync), () => OB.of(undefined))),
         OB.compact,
       ),
     ),
@@ -47,7 +48,7 @@ export const gameLoop$ = <S, A>(
           C.clearRect(S.rect(0, 0, canvasRect.width, canvasRect.height)),
           R.chain(() => render(state)),
           C.renderTo(canvasId, onCanvasNotFound),
-          OB.fromIO,
+          fromIOSync,
         ),
     ),
   )

@@ -1,19 +1,11 @@
 import { pipe } from 'fp-ts/pipeable'
 import * as E from 'fp-ts/Either'
-import * as Z from 'fp-ts-contrib/lib/Zipper'
 import * as IO from 'fp-ts/IO'
 import * as S from 'graphics-ts/lib/Shape'
 import * as C from 'graphics-ts/lib/Canvas'
 import * as assert from 'assert'
-import { assertCalledWith } from './utils'
-import {
-  Sprite,
-  SpriteFrame,
-  animate,
-  fetchImageElement,
-  drawImageOffset,
-  drawSprite,
-} from '../src/Sprite'
+import { assertCalledWith } from './utils/utils'
+import { fetchImageElement, drawImageOffset } from '../src/Image'
 
 // graphics-ts setup
 
@@ -35,30 +27,12 @@ const render: <A>(fa: C.Render<A>) => IO.IO<A> = (fa) =>
 
 export const MILLIS_PER_FRAME = 200
 
-const frameForIndex = (x: number): SpriteFrame => ({
-  rect: S.rect(16 * x, 0, 16, 18),
-  duration: MILLIS_PER_FRAME,
-})
-export const spriteFrames: Z.Zipper<SpriteFrame> = Z.fromNonEmptyArray<SpriteFrame>([
-  frameForIndex(0),
-  frameForIndex(1),
-  frameForIndex(0),
-  frameForIndex(2),
-])
-
 const image = new Image()
 image.src = 'https://opengameart.org/sites/default/files/Green-Cap-Character-16x18.png'
 image.height = 220
 image.width = 440
 
-const testSprite: Sprite = {
-  animationDelta: 0,
-  frames: spriteFrames,
-  rect: S.rect(0, 0, 50, 56),
-  src: image,
-}
-
-describe('Sprite', () => {
+describe('Spritesheet', () => {
   beforeEach(() => {
     document.body.innerHTML = `
       <canvas
@@ -85,29 +59,6 @@ describe('Sprite', () => {
     focusTarget.focus()
     ctx = canvas.getContext('2d') as CanvasRenderingContext2D
     testCtx = testCanvas.getContext('2d') as CanvasRenderingContext2D
-  })
-
-  describe('animate', () => {
-    it('delta beneath current duration leaves it where it is', () => {
-      const newSprite = animate(MILLIS_PER_FRAME - 1)(testSprite)
-      assert.deepStrictEqual(newSprite.frames.lefts.length, 0)
-    })
-    it('delta equal to current duration advances it', () => {
-      const newSprite = animate(MILLIS_PER_FRAME)(testSprite)
-      assert.deepStrictEqual(newSprite.frames.lefts.length, 1)
-    })
-    it('delta above current duration advances it', () => {
-      const newSprite = animate(MILLIS_PER_FRAME + 1)(testSprite)
-      assert.deepStrictEqual(newSprite.frames.lefts.length, 1)
-    })
-    it('can multiple frames from a single delta', () => {
-      const newSprite = animate(MILLIS_PER_FRAME * 2 + 1)(testSprite)
-      assert.deepStrictEqual(newSprite.frames.lefts.length, 2)
-    })
-    it('frame advancement loops', () => {
-      const newSprite = animate(MILLIS_PER_FRAME * 4 + 1)(testSprite)
-      assert.deepStrictEqual(newSprite.frames.lefts.length, 0)
-    })
   })
 
   describe('fetchImageElement', () => {
@@ -177,41 +128,6 @@ describe('Sprite', () => {
         output.y,
         output.width,
         output.height,
-      )
-
-      assert.deepStrictEqual(ctx.__getDrawCalls(), testCtx.__getDrawCalls())
-    })
-  })
-
-  describe('drawSprite', () => {
-    it('should draw a sprite to the canvas', () => {
-      // Test
-      render(drawSprite(testSprite))()
-
-      // Actual
-      testCtx.drawImage(
-        testSprite.src,
-        Z.extract(testSprite.frames).rect.x,
-        Z.extract(testSprite.frames).rect.y,
-        Z.extract(testSprite.frames).rect.width,
-        Z.extract(testSprite.frames).rect.height,
-        testSprite.rect.x,
-        testSprite.rect.y,
-        testSprite.rect.width,
-        testSprite.rect.height,
-      )
-
-      assertCalledWith(
-        ctx.drawImage as jest.Mock,
-        testSprite.src,
-        Z.extract(testSprite.frames).rect.x,
-        Z.extract(testSprite.frames).rect.y,
-        Z.extract(testSprite.frames).rect.width,
-        Z.extract(testSprite.frames).rect.height,
-        testSprite.rect.x,
-        testSprite.rect.y,
-        testSprite.rect.width,
-        testSprite.rect.height,
       )
 
       assert.deepStrictEqual(ctx.__getDrawCalls(), testCtx.__getDrawCalls())

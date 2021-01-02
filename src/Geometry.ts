@@ -1,6 +1,6 @@
 import { pipe, Predicate } from 'fp-ts/function'
 import * as S from 'graphics-ts/lib/Shape'
-import * as RA from 'fp-ts/ReadonlyArray'
+import * as A from 'fp-ts/ReadonlyArray'
 
 export type PointArray = [number, number]
 export type RectVerticies = [PointArray, PointArray, PointArray, PointArray]
@@ -17,21 +17,17 @@ export const toVerticies = (r: S.Rect): RectVerticies => [
 export const toRect = (v: RectVerticies): S.Rect =>
   S.rect(v[0][0], v[0][1], v[2][0] - v[0][0], v[2][1] - v[0][1])
 
-export const readonlyCollisions = <A>(compare: (a: A) => Predicate<A>) => (
+export const collisions = <A>(compare: (a: A) => Predicate<A>) => (
   as: ReadonlyArray<A>,
 ): ReadonlyArray<[A, A]> =>
   pipe(
     as,
-    RA.chainWithIndex((index, a) =>
+    A.chainWithIndex((index, a) =>
       pipe(
         as,
-        RA.dropLeft(index + 1),
-        RA.filter<A>(compare(a)),
-        RA.map((b): [A, A] => [a, b]),
+        A.dropLeft(index + 1),
+        A.filter<A>(compare(a)),
+        A.map((b): [A, A] => [a, b]),
       ),
     ),
   )
-
-export const collisions: <A>(
-  compare: (a: A) => Predicate<A>,
-) => (as: Array<A>) => Array<[A, A]> = readonlyCollisions as never
