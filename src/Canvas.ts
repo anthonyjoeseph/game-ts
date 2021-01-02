@@ -27,8 +27,8 @@ export const canvasRect$ = (canvasId: string): r.Observable<O.Option<S.Rect>> =>
             resizes.observe(canvasElem)
           })
           return pipe(
-            r.merge(r.of(undefined), onResizeCanvas$),
-            OB.chain(() => pipe(canvasElem, canvasRect, OB.fromIO)),
+            r.concat(r.of(undefined), onResizeCanvas$),
+            OB.chain(() => pipe(canvasElem, canvasRect, fromIOSync)),
             ro.map(O.some),
           )
         },

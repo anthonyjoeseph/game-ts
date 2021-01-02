@@ -89,23 +89,18 @@ describe('Render', () => {
               gameLoop$(
                 0,
                 () => pipe(input, ro.mapTo(add(1))),
-                () => {
-                  return pipe(
-                    D.fill(S.rect(0, 0, 100, 100), D.fillStyle(Color.black)),
-                    D.render,
-                  )
-                },
+                () =>
+                  pipe(D.fill(S.rect(0, 0, 0, 0), D.fillStyle(Color.black)), D.render),
                 CANVAS_ID,
                 IO.of(constVoid),
               ),
             ),
-            ro.map(() => {
-              return 1
-            }),
+            ro.mapTo(1),
           )
           expectObservable(result, subs).toBe(expected, {
             a: 1,
             b: 1,
+            c: 1,
           })
         },
       )
