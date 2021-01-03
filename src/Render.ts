@@ -9,7 +9,7 @@ import * as OB from 'fp-ts-rxjs/lib/Observable'
 import * as C from 'graphics-ts/lib/Canvas'
 import * as S from 'graphics-ts/lib/Shape'
 import { canvasRect$ } from './Canvas'
-import { fromIOSync } from './Observable'
+import { fromIOSync } from './util'
 
 export const frameDeltaMillis$ = pipe(
   r.animationFrames(),

@@ -5,7 +5,7 @@ import * as ro from 'rxjs/operators'
 import * as OB from 'fp-ts-rxjs/lib/Observable'
 import * as IO from 'fp-ts/IO'
 import { rect } from 'graphics-ts/lib/Shape'
-import { fromIOSync } from './Observable'
+import { fromIOSync } from './util'
 
 export const windowInnerWidth: IO.IO<number> = () => window.innerWidth
 

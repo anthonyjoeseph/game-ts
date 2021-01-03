@@ -7,7 +7,7 @@ import * as OB from 'fp-ts-rxjs/lib/Observable'
 import * as C from 'graphics-ts/lib/Canvas'
 import * as S from 'graphics-ts/lib/Shape'
 import { ResizeObserver } from '@juggle/resize-observer'
-import { fromIOSync } from './Observable'
+import { fromIOSync } from './util'
 
 export const canvasRect: C.Html<S.Rect> = (canvas) => () => {
   const domrect = canvas.getBoundingClientRect()

@@ -7,9 +7,8 @@ import * as S from 'graphics-ts/lib/Shape'
 import * as D from 'graphics-ts/lib/Drawing'
 import * as Color from 'graphics-ts/lib/Color'
 import { TestScheduler } from 'rxjs/testing'
-import * as r from 'rxjs'
 import * as ro from 'rxjs/operators'
-import { frameDeltaMillis$, gameLoop$ } from '../src/Render'
+import { gameLoop$ } from '../src/Render'
 
 // how-to:
 // https://github.com/ReactiveX/rxjs/blob/master/docs_app/content/guide/testing/marble-testing.md
@@ -47,7 +46,7 @@ describe('Render', () => {
       // based on this:
       // https://github.com/ReactiveX/rxjs/blob/master/spec/observables/dom/animationFrames-spec.ts
       new TestScheduler(assert.deepStrictEqual).run(
-        ({ animate, hot, cold, expectObservable, time }) => {
+        ({ animate, hot, cold, expectObservable }) => {
           const TEST_CANVAS_ID = 'test-canvas'
           const FOCUS_TARGET = 'focus-target'
           const CANVAS_WIDTH = 400
@@ -77,9 +76,6 @@ describe('Render', () => {
           animate('            ---x---x---x')
           const mapped = cold('-m          ')
           const input = hot(' 1----2---3--')
-          const ta = time('    ---|        ')
-          const tb = time('    -------|    ')
-          const tc = time('    -----------|')
           const expected = '   ---a---b---c'
           const subs = '       ^----------!'
 

@@ -1,110 +1,114 @@
-{ "columns":16,
- "image":"tilesheet.png",
- "imageheight":512,
- "imagewidth":512,
- "margin":0,
- "name":"tilesheet",
- "spacing":0,
- "tilecount":256,
- "tiledversion":"1.4.3",
- "tileheight":32,
- "tiles":[
-  {
-    "animation":[
-      {
-        "duration":500,
-        "tileid":12
-      }, 
-      {
-        "duration":500,
-        "tileid":13
-      }, 
-      {
-        "duration":500,
-        "tileid":27
-      }, 
-      {
-        "duration":500,
-        "tileid":28
-      }, 
-      {
-        "duration":500,
-        "tileid":29
-      }, 
-      {
-        "duration":500,
-        "tileid":43
-      }, 
-      {
-        "duration":500,
-        "tileid":44
-      }, 
-      {
-        "duration":500,
-        "tileid":45
-      }],
-    "id":14
-  }, 
-  {
-    "animation":[
-      {
-        "duration":500,
-        "tileid":14
-      }, 
-      {
-        "duration":500,
-        "tileid":15
-      }, 
-      {
-        "duration":500,
-        "tileid":31
-      }, 
-      {
-        "duration":500,
-        "tileid":31
-      }, 
-      {
-        "duration":500,
-        "tileid":46
-      }, 
-      {
-        "duration":500,
-        "tileid":47
-      }, 
-      {
-        "duration":500,
-        "tileid":62
-      }, 
-      {
-        "duration":500,
-        "tileid":63
-      }],
-    "id":238,
-    "objectgroup":
-      {
-        "draworder":"index",
-        "id":2,
-        "name":"",
-        "objects":[
+{
+  "columns": 16,
+  "image": "tilesheet.png",
+  "imageheight": 512,
+  "imagewidth": 512,
+  "margin": 0,
+  "name": "tilesheet",
+  "spacing": 0,
+  "tilecount": 256,
+  "tiledversion": "1.4.3",
+  "tileheight": 32,
+  "tiles": [
+    {
+      "animation": [
+        {
+          "duration": 500,
+          "tileid": 12
+        },
+        {
+          "duration": 500,
+          "tileid": 13
+        },
+        {
+          "duration": 500,
+          "tileid": 27
+        },
+        {
+          "duration": 500,
+          "tileid": 28
+        },
+        {
+          "duration": 500,
+          "tileid": 29
+        },
+        {
+          "duration": 500,
+          "tileid": 43
+        },
+        {
+          "duration": 500,
+          "tileid": 44
+        },
+        {
+          "duration": 500,
+          "tileid": 45
+        }
+      ],
+      "id": 14
+    },
+    {
+      "animation": [
+        {
+          "duration": 500,
+          "tileid": 14
+        },
+        {
+          "duration": 500,
+          "tileid": 15
+        },
+        {
+          "duration": 500,
+          "tileid": 31
+        },
+        {
+          "duration": 500,
+          "tileid": 31
+        },
+        {
+          "duration": 500,
+          "tileid": 46
+        },
+        {
+          "duration": 500,
+          "tileid": 47
+        },
+        {
+          "duration": 500,
+          "tileid": 62
+        },
+        {
+          "duration": 500,
+          "tileid": 63
+        }
+      ],
+      "id": 238,
+      "objectgroup": {
+        "draworder": "index",
+        "id": 2,
+        "name": "",
+        "objects": [
           {
-            "height":20,
-            "id":1,
-            "name":"",
-            "rotation":0,
-            "type":"",
-            "visible":true,
-            "width":18,
-            "x":14,
-            "y":12
-          }],
-        "opacity":1,
-        "type":"objectgroup",
-        "visible":true,
-        "x":0,
-        "y":0
+            "height": 20,
+            "id": 1,
+            "name": "",
+            "rotation": 0,
+            "type": "",
+            "visible": true,
+            "width": 18,
+            "x": 14,
+            "y": 12
+          }
+        ],
+        "opacity": 1,
+        "type": "objectgroup",
+        "visible": true,
+        "x": 0,
+        "y": 0
       }
-  }],
- "tilewidth":32,
- "type":"tileset",
- "version":1.4
+    }
+  ],
+  "tilewidth": 32,
+  "type": "tileset",
+  "version": 1.4
 }

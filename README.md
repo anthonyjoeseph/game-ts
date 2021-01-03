@@ -17,7 +17,7 @@ import * as Color from 'graphics-ts/lib/Color'
 import { Key } from 'ts-key-enum'
 import * as r from 'rxjs'
 import * as ro from 'rxjs/operators'
-import { gameLoop$ } from './lib/Render'
+import { gameLoop$ } from 'game-ts/dist/Render'
 
 type State = boolean
 
@@ -50,6 +50,7 @@ frame$.subscribe()
 # features
 
 - [io-ts](https://github.com/gcanti/io-ts) codecs for
+
   - spritesheets via [spritesheet.js](https://github.com/krzysztof-o/spritesheet.js) or [TexturePacker](https://www.codeandweb.com/texturepacker)
   - levels via [Tiled](https://www.mapeditor.org/)
     - NOTE: tilesets can be packed with `spritesheet.js` or `TexturePacker` as well
