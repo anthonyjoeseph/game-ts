@@ -7,7 +7,7 @@ import * as IO from 'fp-ts/IO'
  * Promises are incompatible with rxjs's TestScheduler:
  * https://github.com/ReactiveX/rxjs/pull/745
  *
- * Since we test with TestScheduler, we syncronous IO
+ * Since we test with TestScheduler, we need syncronous IO
  * @param a IO to be lifted into an observable
  */
 export const fromIOSync = <A>(a: IO.IO<A>): r.Observable<A> => r.defer(() => r.of(a()))
