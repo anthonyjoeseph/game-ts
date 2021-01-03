@@ -83,8 +83,6 @@ describe('Render', () => {
     })
 
     it('waits for animation frames to render & renders initial state', () => {
-      // based on this:
-      // https://github.com/ReactiveX/rxjs/blob/master/spec/observables/dom/animationFrames-spec.ts
       new TestScheduler(assert.deepStrictEqual).run(
         ({ animate, hot, cold, expectObservable }) => {
           animate('            ---x---x---x')
