@@ -82,7 +82,7 @@ describe('Render', () => {
       testCtx = testCanvas.getContext('2d') as CanvasRenderingContext2D
     })
 
-    it('waits for animation frames to render', () => {
+    it('waits for animation frames to render & renders initial state', () => {
       // based on this:
       // https://github.com/ReactiveX/rxjs/blob/master/spec/observables/dom/animationFrames-spec.ts
       new TestScheduler(assert.deepStrictEqual).run(
