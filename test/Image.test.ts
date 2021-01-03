@@ -7,60 +7,7 @@ import * as assert from 'assert'
 import { assertCalledWith } from './utils/utils'
 import { fetchImageElement, drawImageOffset } from '../src/Image'
 
-// graphics-ts setup
-
-const CANVAS_ID = 'canvas'
-const TEST_CANVAS_ID = 'test-canvas'
-const FOCUS_TARGET = 'focus-target'
-const CANVAS_WIDTH = 400
-const CANVAS_HEIGHT = 600
-
-let canvas: HTMLCanvasElement
-let focusTarget: HTMLElement
-let ctx: CanvasRenderingContext2D
-let testCtx: CanvasRenderingContext2D
-
-const render: <A>(fa: C.Render<A>) => IO.IO<A> = (fa) =>
-  pipe(canvas, C.getContext2D, IO.chain(fa))
-
-// game-ts setup
-
-export const MILLIS_PER_FRAME = 200
-
-const image = new Image()
-image.src = 'https://opengameart.org/sites/default/files/Green-Cap-Character-16x18.png'
-image.height = 220
-image.width = 440
-
 describe('Spritesheet', () => {
-  beforeEach(() => {
-    document.body.innerHTML = `
-      <canvas
-        id="${CANVAS_ID}"
-        width="${CANVAS_WIDTH}"
-        height="${CANVAS_HEIGHT}"
-      >
-        <input
-          id="${FOCUS_TARGET}"
-          type="range"
-          min="1"
-          max="12"
-        />
-      </canvas>
-      <canvas
-        id="${TEST_CANVAS_ID}"
-        width="${CANVAS_WIDTH}"
-        height="${CANVAS_HEIGHT}"
-      />
-    `
-    canvas = document.getElementById(CANVAS_ID) as HTMLCanvasElement
-    const testCanvas = document.getElementById(TEST_CANVAS_ID) as HTMLCanvasElement
-    focusTarget = document.getElementById(FOCUS_TARGET) as HTMLElement
-    focusTarget.focus()
-    ctx = canvas.getContext('2d') as CanvasRenderingContext2D
-    testCtx = testCanvas.getContext('2d') as CanvasRenderingContext2D
-  })
-
   describe('fetchImageElement', () => {
     beforeAll(() => {
       // image onload hack taken from this thread:
@@ -94,8 +41,44 @@ describe('Spritesheet', () => {
       // source:
       // https://github.com/gcanti/graphics-ts/blob/1c68635d936d3e2151dccad5f16a3d8df2112657/test/Canvas.test.ts#L773
 
+      const CANVAS_ID = 'canvas'
+      const TEST_CANVAS_ID = 'test-canvas'
+      const FOCUS_TARGET = 'focus-target'
+      const CANVAS_WIDTH = 400
+      const CANVAS_HEIGHT = 600
+
+      const render: <A>(fa: C.Render<A>) => IO.IO<A> = (fa) =>
+        pipe(canvas, C.getContext2D, IO.chain(fa))
+
+      document.body.innerHTML = `
+        <canvas
+          id="${CANVAS_ID}"
+          width="${CANVAS_WIDTH}"
+          height="${CANVAS_HEIGHT}"
+        >
+          <input
+            id="${FOCUS_TARGET}"
+            type="range"
+            min="1"
+            max="12"
+          />
+        </canvas>
+        <canvas
+          id="${TEST_CANVAS_ID}"
+          width="${CANVAS_WIDTH}"
+          height="${CANVAS_HEIGHT}"
+        />
+      `
+      const canvas = document.getElementById(CANVAS_ID) as HTMLCanvasElement
+      const testCanvas = document.getElementById(TEST_CANVAS_ID) as HTMLCanvasElement
+      const focusTarget = document.getElementById(FOCUS_TARGET) as HTMLElement
+      focusTarget.focus()
+      const ctx = canvas.getContext('2d') as CanvasRenderingContext2D
+      const testCtx = testCanvas.getContext('2d') as CanvasRenderingContext2D
+
       const offset = S.rect(20, 40, 100, 120)
       const output = S.rect(100, 150, 80, 100)
+
       const image = new Image()
       image.src = 'https://mdn.mozillademos.org/files/5397/rhino.jpg'
       image.height = 220

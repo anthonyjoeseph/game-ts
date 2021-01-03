@@ -11,9 +11,10 @@ import { Endomorphism } from 'fp-ts/function'
 import { pipe } from 'fp-ts/pipeable'
 import { invert } from 'fp-ts-std/Boolean'
 import { error } from 'fp-ts/Console'
-import * as S from 'graphics-ts/lib/Shape'
-import * as D from 'graphics-ts/lib/Drawing'
 import * as Color from 'graphics-ts/lib/Color'
+import * as S from 'graphics-ts/lib/Shape'
+import * as C from 'graphics-ts/lib/Canvas'
+import * as D from 'graphics-ts/lib/Drawing'
 import { Key } from 'ts-key-enum'
 import * as r from 'rxjs'
 import * as ro from 'rxjs/operators'
@@ -31,7 +32,7 @@ const frame$ = gameLoop$<State>(
       ro.filter((e) => e === Key.Enter),
       ro.mapTo(invert),
     ),
-  (state: State) =>
+  (state: State): C.Render<CanvasRenderingContext2D> =>
     // renders on a window.requestAnimationFrame schedule via rxjs
     // the canvas is cleared before each render
     pipe(

@@ -34,8 +34,10 @@ describe('canvas helpers', () => {
     focusTarget = document.getElementById(FOCUS_TARGET) as HTMLElement
     focusTarget.focus()
   })
-  describe('canvasClientBoundingRect', () => {
+  describe('canvasRect', () => {
     it('should get the correct bounding rect', () => {
+      // all zeroes b/c jsdom doesn't do any rendering
+      // https://github.com/jalal246/dflex/issues/50
       assert.deepStrictEqual(canvasRect(canvas)(), S.rect(0, 0, 0, 0))
     })
   })

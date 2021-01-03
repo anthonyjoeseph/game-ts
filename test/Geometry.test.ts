@@ -44,7 +44,7 @@ describe('Geometry', () => {
     })
   })
 
-  describe('readonlyCollisions & collisions', () => {
+  describe('collisions', () => {
     const intersect = (a: S.Rect) => (b: S.Rect) =>
       G.polygonIntersectsPolygon(toVerticies(a), toVerticies(b))
     it('returns correct collisions', () => {
