@@ -82,14 +82,14 @@ describe('Render', () => {
       testCtx = testCanvas.getContext('2d') as CanvasRenderingContext2D
     })
 
-    it('waits for animation frames to render & renders initial state', () => {
+    it('waits for animation frames to render, renders initial state & groups multiple emissions between frames', () => {
       new TestScheduler(assert.deepStrictEqual).run(
         ({ animate, hot, cold, expectObservable }) => {
-          animate('            ---x---x---x')
-          const mapped = cold('-m          ')
-          const input = hot('  1----2---3--')
-          const expected = '   ---a---b---c'
-          const subs = '       ^----------!'
+          animate('            -x---x---x---x   ')
+          const mapped = cold('---m             ')
+          const input = hot('  1------2--34--   ')
+          const expected = '   -----a---b---(cd)'
+          const subs = '       ^------------!   '
 
           const result = pipe(
             mapped,
@@ -109,6 +109,7 @@ describe('Render', () => {
             a: undefined,
             b: undefined,
             c: undefined,
+            d: undefined,
           })
         },
       )
