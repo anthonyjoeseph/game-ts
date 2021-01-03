@@ -89,7 +89,7 @@ describe('Render', () => {
         ({ animate, hot, cold, expectObservable }) => {
           animate('            ---x---x---x')
           const mapped = cold('-m          ')
-          const input = hot(' 1----2---3--')
+          const input = hot('  1----2---3--')
           const expected = '   ---a---b---c'
           const subs = '       ^----------!'
 
