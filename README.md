@@ -53,7 +53,6 @@ frame$.subscribe()
 
   - spritesheets via [spritesheet.js](https://github.com/krzysztof-o/spritesheet.js) or [TexturePacker](https://www.codeandweb.com/texturepacker)
   - levels via [Tiled](https://www.mapeditor.org/)
-    - NOTE: tilesets can be packed with `spritesheet.js` or `TexturePacker` as well
 
 - rectangle conversions for denotative geometry (collisions etc) with [geometric.js](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/geometric/index.d.ts)
 
