@@ -2,6 +2,12 @@
 
 Combines graphics-ts with rxjs, plus disparate utilities for input & sprites
 
+# installation
+
+```ts
+yarn add game-ts
+```
+
 # example usage
 
 Toggles between blue and black when the 'Enter' key is pressed
