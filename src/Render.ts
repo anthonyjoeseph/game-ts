@@ -1,31 +1,35 @@
 import { pipe } from 'fp-ts/pipeable'
-import { Endomorphism, flow } from 'fp-ts/function'
-import * as IO from 'fp-ts/IO'
-import * as O from 'fp-ts/Option'
+import { Endomorphism } from 'fp-ts/function'
+import * as E from 'fp-ts/Either'
 import * as R from 'fp-ts-contrib/lib/ReaderIO'
 import * as r from 'rxjs'
 import * as ro from 'rxjs/operators'
 import * as OB from 'fp-ts-rxjs/lib/Observable'
+import * as OBE from 'fp-ts-rxjs/lib/ObservableEither'
 import * as C from 'graphics-ts/lib/Canvas'
 import * as S from 'graphics-ts/lib/Shape'
 import { canvasRect$ } from './Canvas'
 import { fromIOSync } from './util'
 
-export const frameDeltaMillis$ = pipe(
-  r.animationFrames(),
-  OB.map(({ elapsed }) => elapsed),
-  ro.startWith(0),
-  ro.pairwise(),
-  OB.map(([prev, cur]) => cur - prev),
-)
+const renderTo$ = (canvasId: string) => <A>(render: C.Render<A>) => {
+  const lefts = new r.Subject<E.Either<RenderError, void>>()
+  const rights: OBE.ObservableEither<RenderError, void> = pipe(
+    render,
+    C.renderTo(canvasId, () => () => lefts.next(E.left('CannotRender'))),
+    fromIOSync,
+    ro.tap(() => lefts.complete()),
+    OBE.rightObservable,
+  )
+  return r.merge(lefts, rights)
+}
 
-export const gameLoop$ = <S, A = CanvasRenderingContext2D>(
+export type RenderError = 'NoCanvasRect' | 'CannotRender'
+export const renderWithState$ = <S, A = CanvasRenderingContext2D>(
   initialState: S,
   input: (state$: r.Observable<S>) => r.Observable<Endomorphism<S>>,
   render: (state: S) => C.Render<A>,
   canvasId: string,
-  onCanvasNotFound: () => IO.IO<void>,
-): r.Observable<void> => {
+): OBE.ObservableEither<RenderError, void> => {
   const state$ = new r.BehaviorSubject<S>(initialState)
   return pipe(
     state$,
@@ -35,20 +39,20 @@ export const gameLoop$ = <S, A = CanvasRenderingContext2D>(
     ro.tap((state) => state$.next(state)),
     ro.startWith(initialState),
     ro.observeOn(r.animationFrameScheduler),
-    ro.withLatestFrom(
-      pipe(
-        canvasRect$(canvasId),
-        OB.chainFirst(O.fold(flow(onCanvasNotFound, fromIOSync), () => OB.of(undefined))),
-        OB.compact,
-      ),
-    ),
+    ro.withLatestFrom(canvasRect$(canvasId)),
     OB.chain(
-      ([state, canvasRect]): r.Observable<void> =>
+      ([state, canvasRectOpt]): OBE.ObservableEither<RenderError, void> =>
         pipe(
-          C.clearRect(S.rect(0, 0, canvasRect.width, canvasRect.height)),
-          R.chain(() => render(state)),
-          C.renderTo(canvasId, onCanvasNotFound),
-          fromIOSync,
+          canvasRectOpt,
+          OB.of,
+          OB.map(E.fromOption((): RenderError => 'NoCanvasRect')),
+          OBE.chain((canvasRect) =>
+            pipe(
+              C.clearRect(S.rect(0, 0, canvasRect.width, canvasRect.height)),
+              R.chain(() => render(state)),
+              renderTo$(canvasId),
+            ),
+          ),
         ),
     ),
   )

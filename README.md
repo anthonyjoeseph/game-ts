@@ -18,12 +18,13 @@ import * as D from 'graphics-ts/lib/Drawing'
 import { Key } from 'ts-key-enum'
 import * as r from 'rxjs'
 import * as ro from 'rxjs/operators'
-import { gameLoop$ } from 'game-ts/dist/Render'
+import * as OBE from 'fp-ts-rxjs/ObservableEither'
+import { renderWithState$, RenderError } from 'game-ts/dist/Render'
 
 type State = boolean
 
 const initialState: State = false
-const frame$ = gameLoop$<State>(
+const frame$: OBE.ObservableEither<RenderError, void> = renderWithState$<State>(
   initialState,
   (state$: r.Observable<State>): r.Observable<Endomorphism<State>> =>
     pipe(
@@ -42,8 +43,7 @@ const frame$ = gameLoop$<State>(
       ),
       D.render,
     ),
-  'canvas',
-  () => error('canvas not found'),
+  'canvasId',
 )
 frame$.subscribe()
 ```
@@ -65,4 +65,4 @@ frame$.subscribe()
 
 # pairs well with
 
-- box2D physics via [planck.js](https://github.com/shakiba/planck.js/blob/master/lib/index.d.ts) ([world.step](https://github.com/shakiba/planck.js/blob/master/docs/classes/world.md#step) works well with [frameDeltaMillis$](https://github.com/anthonyjoeseph/game-ts/blob/master/src/Render.ts))
+- box2D physics via [planck.js](https://github.com/shakiba/planck.js/blob/master/lib/index.d.ts) ([world.step](https://github.com/shakiba/planck.js/blob/master/docs/classes/world.md#step) works well with an rxjs timer)

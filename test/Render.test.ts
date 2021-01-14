@@ -1,46 +1,21 @@
 import * as assert from 'assert'
 import { pipe } from 'fp-ts/pipeable'
-import { constVoid } from 'fp-ts/function'
 import { add } from 'fp-ts-std/Number'
-import * as IO from 'fp-ts/IO'
+import * as E from 'fp-ts/Either'
 import * as S from 'graphics-ts/lib/Shape'
 import * as D from 'graphics-ts/lib/Drawing'
 import * as Color from 'graphics-ts/lib/Color'
 import { TestScheduler } from 'rxjs/testing'
 import * as r from 'rxjs'
 import * as ro from 'rxjs/operators'
-import { frameDeltaMillis$, gameLoop$ } from '../src/Render'
+import { RenderError, renderWithState$ } from '../src/Render'
+import { constVoid } from 'fp-ts/lib/function'
 
 // how-to:
 // https://github.com/ReactiveX/rxjs/blob/master/docs_app/content/guide/testing/marble-testing.md
 
 describe('Render', () => {
   const CANVAS_ID = 'canvas'
-
-  describe('frameDeltaMillis$', () => {
-    it('outputs the time since the last animation frame, starting at the first animation frame', () => {
-      // based on this:
-      // https://github.com/ReactiveX/rxjs/blob/master/spec/observables/dom/animationFrames-spec.ts
-      new TestScheduler(assert.deepStrictEqual).run(
-        ({ animate, cold, expectObservable, time }) => {
-          animate('            x--x---x---x')
-          const mapped = cold('-m          ')
-          const tm = time('    -|          ')
-          const ta = time('    ---|        ')
-          const tb = time('    -------|    ')
-          const tc = time('    -----------|')
-          const expected = '   ---a---b---c'
-          const subs = '       ^----------!'
-          const result = pipe(mapped, ro.mergeMapTo(frameDeltaMillis$))
-          expectObservable(result, subs).toBe(expected, {
-            a: ta - tm,
-            b: tb - ta,
-            c: tc - tb,
-          })
-        },
-      )
-    })
-  })
 
   describe('gameLoop$', () => {
     let canvas: HTMLCanvasElement
@@ -82,6 +57,17 @@ describe('Render', () => {
       testCtx = testCanvas.getContext('2d') as CanvasRenderingContext2D
     })
 
+    it('Emits an error if the canvas doesnt exist', async () => {
+      const a = renderWithState$(
+        0,
+        () => r.EMPTY,
+        () => () => constVoid,
+        'BadCanvasId',
+      )
+      const error: E.Either<RenderError, void> = await r.firstValueFrom(a)
+      assert.deepStrictEqual(error, E.left('NoCanvasRect'))
+    })
+
     it('waits for animation frames to render, renders initial state & groups multiple emissions between frames', () => {
       new TestScheduler(assert.deepStrictEqual).run(
         ({ animate, hot, cold, expectObservable }) => {
@@ -94,13 +80,12 @@ describe('Render', () => {
           const result = pipe(
             mapped,
             ro.mergeMapTo(
-              gameLoop$(
+              renderWithState$(
                 0,
                 () => pipe(input, ro.mapTo(add(1))),
                 () =>
                   pipe(D.fill(S.rect(0, 0, 0, 0), D.fillStyle(Color.black)), D.render),
                 CANVAS_ID,
-                IO.of(constVoid),
               ),
             ),
             ro.mapTo(undefined),
@@ -123,13 +108,12 @@ describe('Render', () => {
 
       // Test
       await pipe(
-        gameLoop$(
+        renderWithState$(
           firstX,
           () => r.from([add(1), add(1)]),
           (x) =>
             pipe(D.fill(S.rect(x, y, width, height), D.fillStyle(Color.black)), D.render),
           CANVAS_ID,
-          IO.of(constVoid),
         ),
         (obs) => r.lastValueFrom(obs),
       )
