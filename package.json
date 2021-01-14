@@ -2,7 +2,7 @@
   "private": false,
   "name": "game-ts",
   "description": "Functional Game Engine for Typescript",
-  "version": "0.7.3",
+  "version": "0.7.4",
   "license": "MIT",
   "author": "Anthony Gabriele <typesafefrontend@gmail.com>",
   "repository": {
