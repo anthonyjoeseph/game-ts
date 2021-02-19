@@ -1,15 +1,15 @@
 import * as assert from 'assert'
-import { pipe } from 'fp-ts/pipeable'
 import { add } from 'fp-ts-std/Number'
 import * as E from 'fp-ts/Either'
-import * as S from 'graphics-ts/lib/Shape'
-import * as D from 'graphics-ts/lib/Drawing'
+import { constVoid } from 'fp-ts/lib/function'
+import { pipe } from 'fp-ts/pipeable'
 import * as Color from 'graphics-ts/lib/Color'
-import { TestScheduler } from 'rxjs/testing'
+import * as D from 'graphics-ts/lib/Drawing'
+import * as S from 'graphics-ts/lib/Shape'
 import * as r from 'rxjs'
 import * as ro from 'rxjs/operators'
+import { TestScheduler } from 'rxjs/testing'
 import { RenderError, renderWithState$ } from '../src/Render'
-import { constVoid } from 'fp-ts/lib/function'
 
 // how-to:
 // https://github.com/ReactiveX/rxjs/blob/master/docs_app/content/guide/testing/marble-testing.md

@@ -1,22 +1,21 @@
-import { pipe } from 'fp-ts/pipeable'
-import { Endomorphism } from 'fp-ts/function'
-import * as E from 'fp-ts/Either'
 import * as R from 'fp-ts-contrib/lib/ReaderIO'
-import * as r from 'rxjs'
-import * as ro from 'rxjs/operators'
 import * as OB from 'fp-ts-rxjs/lib/Observable'
 import * as OBE from 'fp-ts-rxjs/lib/ObservableEither'
+import * as E from 'fp-ts/Either'
+import { Endomorphism } from 'fp-ts/function'
+import { pipe } from 'fp-ts/pipeable'
 import * as C from 'graphics-ts/lib/Canvas'
 import * as S from 'graphics-ts/lib/Shape'
+import * as r from 'rxjs'
+import * as ro from 'rxjs/operators'
 import { canvasRect$ } from './Canvas'
-import { fromIOSync } from './util'
 
 const renderTo$ = (canvasId: string) => <A>(render: C.Render<A>) => {
   const lefts = new r.Subject<E.Either<RenderError, void>>()
   const rights: OBE.ObservableEither<RenderError, void> = pipe(
     render,
     C.renderTo(canvasId, () => () => lefts.next(E.left('CannotRender'))),
-    fromIOSync,
+    OB.fromIO,
     ro.tap(() => lefts.complete()),
     OBE.rightObservable,
   )

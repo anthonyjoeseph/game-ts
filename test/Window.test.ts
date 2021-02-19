@@ -1,8 +1,8 @@
+import * as assert from 'assert'
 import { pipe } from 'fp-ts/pipeable'
 import * as S from 'graphics-ts/lib/Shape'
 import * as r from 'rxjs'
 import * as ro from 'rxjs/operators'
-import * as assert from 'assert'
 import { windowInnerHeight, windowInnerWidth, windowRect$ } from '../src/Window'
 
 // source:
@@ -40,7 +40,7 @@ describe('window helpers', () => {
       // source:
       // https://gist.github.com/remarkablemark/8e5a247a663db40f2a2abe420ac43234
       const complete$ = new r.Subject<S.Rect[]>()
-      pipe(windowRect$, ro.observeOn(r.asyncScheduler), ro.take(3), ro.toArray(), (obs) =>
+      pipe(windowRect$, ro.observeOn(r.asyncScheduler), ro.skip(1), ro.take(3), ro.toArray(), (obs) =>
         obs.subscribe(complete$),
       )
 

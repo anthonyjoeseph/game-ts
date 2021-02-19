@@ -65,7 +65,7 @@
     "assert": "^2.0.0",
     "fetch-img": "^0.1.0",
     "fp-ts-contrib": "^0.1.21",
-    "fp-ts-rxjs": "^0.6.11",
+    "fp-ts-rxjs": "^0.6.13",
     "fp-ts-std": "^0.7.0",
     "graphics-ts": "^1.1.0",
     "io-ts": "^2.2.13",
